@@ -16,28 +16,55 @@ $('#goHome').on('click', () => {
 });
 
 // People button click
-$('#getPeople').on('click', () => {
+// $('#getPeople').on('click', () => {
+    // $('.logo').hide();
+    // $('#spinner img').show();
+    // $('#planets').hide();
+    // $('#body').empty();
+//     if (people === undefined) {
+//         $.ajax({
+//             method: 'GET',
+//             url: peopleUrl,
+//             success: (data) => {
+//                 console.log(data);
+//                 people = data;
+//                 peopleSW(people);
+//             }
+//         })
+//     } else {
+//         // $(table).show();
+//         // $('#people').show();
+//         peopleSW(people)
+//     }
+// });
+function getPeopleData(url){
     $('.logo').hide();
     $('#spinner img').show();
     $('#planets').hide();
     $('#body').empty();
     if (people === undefined) {
-        $.ajax({
-            method: 'GET',
-            url: peopleUrl,
-            success: (data) => {
-                console.log(data);
-                people = data;
-                peopleSW(people);
-            }
-        })
+    fetch(url)
+    .then(people => people.json())
+    .then(people => {
+        if(people.next){
+            getPeopleData(people.next)
+        }
+        console.log(people);
+    })
+    .catch(e => {
+        debugger;
+        console.log(e);
+    })
     } else {
-        // $(table).show();
-        // $('#people').show();
+        $(table).show();
+        $('#people').show();
         peopleSW(people)
     }
-});
+}
 
+$('#getPeople').on('click', () => {
+    getPeopleData(peopleUrl)
+})
 // People show function
 function peopleSW() {
     $('#spinner img').hide();
@@ -50,8 +77,9 @@ function peopleSW() {
         let peopleBirth = peopleResult[i].birth_year;
         let peopleHeight = peopleResult[i].height;
         let peopleMass = peopleResult[i].mass;
+        let personURL = peopleResult[i].url;
         $('tbody').append(`<tr>
-            <td>${peopleName}</td>
+            <td><a href='${personURL}'>${peopleName}</a></td>
             <td>${peopleGender}</td>
             <td>${peopleBirth}</td>
             <td>${peopleHeight}</td>
