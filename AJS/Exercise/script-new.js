@@ -1,6 +1,6 @@
 const peopleUrl = 'https://swapi.co/api/people/';
 const planetsUrl = 'https://swapi.co/api/planets/';
-let people;
+let people = [];
 let planets;
 let peopleNameArr = [];
 let x;
@@ -42,33 +42,40 @@ function getPeopleData(url){
     $('#spinner img').show();
     $('#planets').hide();
     $('#body').empty();
-    if (people === undefined) {
+    // if (people === undefined) {
     fetch(url)
-    .then(people => people.json())
-    .then(people => {
-        if(people.next){
-            getPeopleData(people.next)
+    .then(response => response.json())
+    .then(response => {
+        people.push(response.results)   
+        if(response.next){
+            // console.log(people);
+            getPeopleData(response.next)
+        }else{
+            $(table).show();
+            $('#people').show();
+            peopleSW(people)
         }
-        console.log(people);
     })
     .catch(e => {
-        debugger;
+        // debugger;
         console.log(e);
     })
-    } else {
-        $(table).show();
-        $('#people').show();
-        peopleSW(people)
-    }
 }
 
 $('#getPeople').on('click', () => {
     getPeopleData(peopleUrl)
 })
+let peopleResult = [];
 // People show function
-function peopleSW() {
+function peopleSW(people) {
     $('#spinner img').hide();
-    peopleResult = people.results;
+    for(i=0;i<people.length;i++){
+        for(j=0;j<people[i].length;j++){
+            peopleResult.push(people[i][j])
+        }
+    }
+    // console.log(peopleResult)
+
     $(table).show();
     $('#people').show();
     for (let i = 0; i < peopleResult.length; i++) {
@@ -79,7 +86,7 @@ function peopleSW() {
         let peopleMass = peopleResult[i].mass;
         let personURL = peopleResult[i].url;
         $('tbody').append(`<tr>
-            <td><a href='${personURL}'>${peopleName}</a></td>
+            <td><a target="_blank" href='${personURL}'>${peopleName}</a></td>
             <td>${peopleGender}</td>
             <td>${peopleBirth}</td>
             <td>${peopleHeight}</td>
